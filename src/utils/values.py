@@ -1,0 +1,16 @@
+# Screen dimensions
+SCREEN_SIZE = 800
+
+# Board dimensions
+NB_SQUARES = 8
+SQUARE_SIZE = SCREEN_SIZE // NB_SQUARES
+
+# General Buttons
+G_BUTTON_SIZE_X = 250
+G_BUTTON_SIZE_Y = 50
+G_BUTTON_POS_X = (SCREEN_SIZE - G_BUTTON_SIZE_X) // 2
+
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
