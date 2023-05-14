@@ -1,38 +1,110 @@
 import pygame
+from PIL import ImageFont
+
 
 class Button:
-    def __init__(self, screen, position, size, color, text, onclick):
+    def __init__(self, screen, position, size, color, text, font, onclick=None):
 
+        # Screen
         self.screen = screen
-        self.width_ratio = size[0] / screen.get_width()
-        self.height_ratio = size[1] / screen.get_height()
-        self.image = pygame.Surface(size)
-        self.image.fill(color)
-        self.rect = pygame.Rect((0, 0), size)
+
+        # Position
+        self.relative_x = position[0]
+        self.relative_y = position[1]
+        self.relative_position = position
+
+        # Size
+        self.relative_width = size[0]
+        self.relative_height = size[1]
+        self.relative_size = size
+
+        # Color
+        self.color = color
+
+        # Text
+        self.text = text
+        self.font = 'arial.ttf'
+
+        # Onclick function
         self.onclick = onclick
 
-        font = pygame.font.SysFont(None, 32)
-        text = font.render(text, True, (0, 0, 0))
+        # Font size
+        self.relative_font_width = font[0]
+        self.relative_font_height = font[1]
+        self.relative_font_size = font
+
+        # Cursor
+        self.cursor = pygame.SYSTEM_CURSOR_HAND
+
+        self.image = None
+        self.rect = None
+
+    @property
+    def x(self):
+        return self.relative_x * self.screen.get_width() / 100
+
+    @property
+    def y(self):
+        return self.relative_y * self.screen.get_height() / 100
+
+    @property
+    def position(self):
+        return self.x, self.y
+
+    @property
+    def width(self):
+        return self.relative_width * self.screen.get_width() / 100
+
+    @property
+    def height(self):
+        return self.relative_height * self.screen.get_height() / 100
+
+    @property
+    def size(self):
+        return self.width, self.height
+
+    @property
+    def font_size(self):
+        font = ImageFont.truetype(self.font, 100)
+        size = font.getsize(self.text)
+        width = self.relative_font_width * self.width // size[0]
+        height = self.relative_font_height * self.height // size[1]
+        return round(min(width, height))
+
+    def draw(self):
+        self.image = pygame.Surface(self.size)
+        self.image.fill(self.color)
+        self.rect = pygame.Rect((0, 0), self.size)
+
+        font = pygame.font.SysFont(self.font, self.font_size)
+        text = font.render(self.text, True, (0, 0, 0))
         text_rect = text.get_rect()
         text_rect.center = self.rect.center
 
         self.image.blit(text, text_rect)
 
         # set after centering text
-        self.rect.topleft = position
+        self.rect.center = self.position
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+        self.screen.blit(self.image, self.rect)
 
-    def resize(self, screen):
-        width = self.width_ratio * screen.get_width()
-        height = self.height_ratio * screen.get_height()
-        self.image = pygame.transform.scale(self.image, (width, height))
-        screen.blit(self.image, self.rect)
+    def resize(self):
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        self.rect.center = self.position
+        self.draw()
 
     def click(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
             if self.rect.collidepoint(pos):
-                self.onclick()
+                if self.onclick:
+                    self.onclick()
+
+    def hover(self):
+        pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pos):
+            return True
+        else:
+            return False
+
 

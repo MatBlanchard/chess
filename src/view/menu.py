@@ -10,17 +10,36 @@ class Menu:
         screen = self.screen
         screen.fill((0, 0, 0))
 
-        running = True
-        while running:
+        while True:
             for button in self.buttons:
-                button.draw(screen)
+                button.draw()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                if event.type == pygame.WINDOWRESIZED:
-                    for button in self.buttons:
-                        button.resize(screen)
-                for button in self.buttons:
-                    button.click(event)
+                    self.handle_quit()
+                if event.type == pygame.WINDOWSIZECHANGED:
+                    self.handle_resize()
+                self.handle_buttons(event)
+
             pygame.display.flip()
+
+    @staticmethod
+    def handle_quit():
+        pygame.quit()
+        exit()
+
+    def handle_resize(self):
+        for button in self.buttons:
+            button.resize()
+
+    def handle_buttons(self, event):
+        hover = False
+        hover_button = None
+        for button in self.buttons:
+            button.click(event)
+            if button.hover():
+                hover = True
+                hover_button = button
+            if hover:
+                pygame.mouse.set_cursor(hover_button.cursor)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
