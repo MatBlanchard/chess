@@ -5,6 +5,7 @@ class Menu:
     def __init__(self, screen):
         self.screen = screen
         self.buttons = []
+        self.board = None
 
     def run(self):
         screen = self.screen
@@ -13,6 +14,8 @@ class Menu:
         while True:
             for button in self.buttons:
                 button.draw()
+            if self.board:
+                self.board.draw()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.handle_quit()
@@ -29,7 +32,7 @@ class Menu:
 
     def handle_resize(self):
         for button in self.buttons:
-            button.resize()
+            button.draw()
 
     def handle_buttons(self, event):
         hover = False
